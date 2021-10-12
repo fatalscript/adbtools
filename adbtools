@@ -1,0 +1,193 @@
+#!/bin/bash
+
+#Define values for later in the script
+numpad_jail=1 #Jail in the numpad = true
+
+while true;
+do
+  clear
+  echo AdbTools - Version 1.1.0 by Nico
+  echo ""
+  echo "--Buttons--"
+  echo "[1] - Vol +"
+  echo "[2] - Vol -"
+  echo "[3] - Power"
+  echo "[4] - Home"
+  echo "[B] - Back"
+  echo "[5] - Menu"
+  echo "[6] - Camera"
+  echo ""
+  echo "--Touchscreen--"
+  echo "[7] - Swipe up"
+  echo "[8] - Swipe down"
+  echo "[9] - Swipe L -> R"
+  echo "[0] - Swipe R -> L"
+  echo ""
+  echo "--Power Options--"
+  echo "[R] - Reboot device"
+  echo "[P] - Power off device"
+  echo "[Q] - ScreenLock device"
+  echo ""
+  echo "--Keyboard & Text--"
+  echo "[T] - Type custom Text"
+  echo "[N] - Open Numpad simulation"
+  echo "[S] - Run SpamBot"
+  echo ""
+  echo "--Debug--"
+  echo "[Y] - Run Application by Package name"
+  echo "[.] - Open Shell"
+  echo "[M] - Run scrcpy"
+  echo "[Shift + M] - Run scrcpy with different resolution"
+  echo ""
+  echo "--Others--"
+  echo "[X] - Exit script"
+  echo ""
+  echo ""
+  echo "Event: "
+  read -s -n 1 op
+  case $op in
+    1)
+    adb shell input keyevent "KEYCODE_VOLUME_UP"
+    ;;
+    2)
+    adb shell input keyevent "KEYCODE_VOLUME_DOWN"
+    ;;
+    3)
+    adb shell input keyevent "KEYCODE_POWER"
+    ;;
+    4)
+    adb shell input keyevent "KEYCODE_HOME"
+    ;;
+    b)
+    adb shell input keyevent "KEYCODE_BACK"
+    ;;
+    5)
+    adb shell input keyevent "KEYCODE_MENU"
+    ;;
+    6)
+    adb shell input keyevent "KEYCODE_CAMERA"
+    ;;
+    7)
+    adb shell input swipe 573 1908 573 713 500
+    ;;
+    8)
+    adb shell input swipe 573 713 573 1900 500
+    ;;
+    9)
+    adb shell input swipe 204 1200 800 1200 500
+    ;;
+    0)
+    adb shell input swipe 800 1200 204 1200 500
+    ;;
+    r)
+    adb shell reboot
+    ;;
+    p)
+    adb shell reboot -p
+    ;;
+    q)
+    adb shell input keyevent 26
+    ;;
+    t)
+    echo "Enter Text and hit enter: "
+    read custom_text_userinput
+    adb shell input text "$custom_text_userinput"
+    ;;
+    n)
+    clear
+    echo "-- Numpad simulation --"
+    echo ""
+    echo "[1]  [2]  [3]"
+    echo "[4]  [5]  [6]"
+    echo "[7]  [8]  [9]"
+    echo "[*]  [0]  [#]"
+    echo ""
+    echo "[X] - Go back to main menu"
+    while [ $numpad_jail = 1 ]
+    do
+      read -s -n 1 custom_numpad_userinput
+      case $custom_numpad_userinput in
+        1)
+        adb shell input keyevent "KEYCODE_1"
+        ;;
+        2)
+        adb shell input keyevent "KEYCODE_2"
+        ;;
+        3)
+        adb shell input keyevent "KEYCODE_3"
+        ;;
+        4)
+        adb shell input keyevent "KEYCODE_4"
+        ;;
+        5)
+        adb shell input keyevent "KEYCODE_5"
+        ;;
+        6)
+        adb shell input keyevent "KEYCODE_6"
+        ;;
+        7)
+        adb shell input keyevent "KEYCODE_7"
+        ;;
+        8)
+        adb shell input keyevent "KEYCODE_8"
+        ;;
+        9)
+        adb shell input keyevent "KEYCODE_9"
+        ;;
+        0)
+        adb shell input keyevent "KEYCODE_0"
+        ;;
+        x)
+        numpad_jail=0
+        ;;
+        *)
+        echo "Invalid!"
+        ;;
+      esac
+    done
+    ;;
+    x)
+    if test -f "nul";
+    then
+      rm -f nul
+      exit 0
+    fi
+    ;;
+    M)
+    echo "Resolution: "
+    read scrcpy_resolution_userinput
+    scrcpy -m $scrcpy_resolution_userinput &>nul & disown & rm nul
+    ;;
+    m)
+    scrcpy &>nul & disown & rm nul
+    ;;
+    .)
+    adb shell
+    ;;
+    y)
+    echo "am start...:"
+    read $am_start_command_userinput
+    am start $am_start_command_userinput
+    ;;
+    s)
+    clear
+    echo "-- Spambot --"
+    echo ""
+    echo "Enter Text to spam: "
+    read custom_text_to_spam_userinput
+    echo "Amount to spam: "
+    read custom_amount_to_spam_userinput
+    echo "Spamming... Confirming text with the Enter Key."
+    while [ $custom_amount_to_spam_userinput -gt 0 ]
+    do
+    adb shell input text "$custom_text_to_spam_userinput"
+    adb shell input keyevent "KEYCODE_ENTER"
+    custom_amount_to_spam_userinput=$((custom_amount_to_spam_userinput-1))
+    done
+    ;;
+    *)
+    echo "Invalid!"
+    ;;
+  esac
+done
+exit 1
